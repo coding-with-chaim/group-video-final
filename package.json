@@ -9,7 +9,6 @@
     "socket.io": "^2.3.0"
   },
   "scripts": {
-    "start": "PROD=true node server.js",
-    "postinstall": "cd ./client && yarn"
+    "start": "PROD=true node server.js"
   }
 }
