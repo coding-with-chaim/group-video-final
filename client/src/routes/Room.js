@@ -154,7 +154,7 @@ const Room = (props) => {
       }
       else {
         console.log(data + ' not a valid url.');
-        if (data === 'play') {
+        if (data.includes('play')) {
           console.log("Received play command");
           if (audio !== null) {
             console.log("playing audio...");
