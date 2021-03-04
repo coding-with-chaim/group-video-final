@@ -144,6 +144,12 @@ const Room = (props) => {
         peer.on('data', data => {
           // got a data channel message
           console.log('got a message from peer: ' + data)
+          if (isValidURL(data)) {
+            setAudio(data);
+          }
+          else {
+            console.log('not a valid url.');
+          }
         })
 
         peer.on("signal", signal => {
