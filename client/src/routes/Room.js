@@ -22,7 +22,11 @@ const Video = (props) => {
 
     useEffect(() => {
         props.peer.on("stream", stream => {
+          if('srcObject' in ref.current){
             ref.current.srcObject = stream;
+          } else {
+            ref.current.src = window.URL.createObjectURL(stream)
+          }
         })
     }, []);
 
