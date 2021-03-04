@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import Peer from "simple-peer";
 import styled from "styled-components";
+import ReactAudioPlayer from 'react-audio-player';
 
 const Container = styled.div`
     padding: 20px;
@@ -57,6 +58,7 @@ const DataInput = (props) => {
 
 const Room = (props) => {
     const [peers, setPeers] = useState([]);
+    const [audio, setAudio] = useState("");
     const socketRef = useRef();
     const userVideo = useRef();
     const peersRef = useRef([]);
@@ -64,7 +66,7 @@ const Room = (props) => {
 
     useEffect(() => {
         socketRef.current = io.connect("/");
-        navigator.mediaDevices.getUserMedia({ video: videoConstraints, audio: true }).then(stream => {
+        navigator.mediaDevices.getUserMedia({ video: videoConstraints, audio: false }).then(stream => {
             userVideo.current.srcObject = stream;
             socketRef.current.emit("join room", roomID);
             socketRef.current.on("all users", users => {
@@ -97,6 +99,16 @@ const Room = (props) => {
         })
     }, []);
 
+    function isValidURL(str) {
+      var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+        '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+        '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+        '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+      return !!pattern.test(str);
+    }
+
     function createPeer(userToSignal, callerID, stream) {
         const peer = new Peer({
             initiator: true,
@@ -111,6 +123,9 @@ const Room = (props) => {
         peer.on('data', data => {
           // got a data channel message
           console.log('got a message from peer: ' + data)
+          if (isValidURL(data)) {
+            setAudio(data);
+          }
         })
 
         return peer;
@@ -150,15 +165,21 @@ const Room = (props) => {
 
     return (
         <Container>
-            <StyledVideo muted ref={userVideo} autoPlay playsInline />
-            {peers.map((peer, index) => {
-                return (
-                  <div>
-                    <DataInput onSubmit={sendToPeer} peerKey={index}/>
-                    <Video key={index} peer={peer} />
-                  </div>
-                );
-            })}
+          {audio !== "" &&
+            <ReactAudioPlayer
+              src={audio}
+              autoPlay
+            />
+          }
+          <StyledVideo muted ref={userVideo} autoPlay playsInline />
+          {peers.map((peer, index) => {
+              return (
+                <div>
+                  <DataInput onSubmit={sendToPeer} peerKey={index}/>
+                  <Video key={index} peer={peer} />
+                </div>
+              );
+          })}
         </Container>
     );
 };
