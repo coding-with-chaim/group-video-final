@@ -126,6 +126,9 @@ const Room = (props) => {
           if (isValidURL(data)) {
             setAudio(data);
           }
+          else {
+            console.log('not a valid url.');
+          }
         })
 
         return peer;
