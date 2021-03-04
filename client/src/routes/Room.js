@@ -57,7 +57,7 @@ const DataInput = (props) => {
 
 const Room = (props) => {
     const [peers, setPeers] = useState([]);
-    const [audio, setAudio] = useState(null);
+    const [audio, setAudio] = useState(new Audio());
     const socketRef = useRef();
     const userVideo = useRef();
     const peersRef = useRef([]);
@@ -156,10 +156,7 @@ const Room = (props) => {
         console.log(data + ' not a valid url.');
         if (data.includes('play')) {
           console.log("Received play command");
-          if (audio !== null) {
-            console.log("playing audio...");
-            audio.play();
-          }
+          audio.play();
         }
       }
     }
