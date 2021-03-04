@@ -148,12 +148,14 @@ const Room = (props) => {
 
     function onDataReceive(data) {
       if (isValidURL(data)) {
-        setAudio(new Audio(data));
+        const audioObject = new Audio(data);
+        setAudio(audioObject);
         console.log("loaded audio from " + data);
       }
       else {
-        console.log(data + 'not a valid url.');
+        console.log(data + ' not a valid url.');
         if (data === 'play') {
+          console.log("Received play command");
           if (audio !== null) {
             console.log("playing audio...");
             audio.play();
