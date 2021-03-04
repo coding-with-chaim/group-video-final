@@ -152,8 +152,8 @@ const Room = (props) => {
         console.log("loaded audio from " + data);
       }
       else {
-        console.log('not a valid url.');
-        if (data === "play") {
+        console.log(data + 'not a valid url.');
+        if (data === 'play') {
           if (audio !== null) {
             console.log("playing audio...");
             audio.play();
@@ -175,7 +175,7 @@ const Room = (props) => {
 
     return (
         <Container>
-          <button onClick={() => {sendToAll("play"); audio.play();}}>Play</button>
+          <button onClick={() => {sendToAll('play'); audio.play();}}>Play</button>
           <StyledVideo muted ref={userVideo} autoPlay playsInline />
           {peers.map((peer, index) => {
               return (
