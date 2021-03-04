@@ -90,6 +90,11 @@ const Room = (props) => {
             socketRef.current.emit("sending signal", { userToSignal, callerID, signal })
         })
 
+        peer.on('data', data => {
+          // got a data channel message
+          console.log('got a message from peer: ' + data)
+        })
+
         return peer;
     }
 
@@ -98,6 +103,11 @@ const Room = (props) => {
             initiator: false,
             trickle: false,
             stream,
+        })
+
+        peer.on('data', data => {
+          // got a data channel message
+          console.log('got a message from peer: ' + data)
         })
 
         peer.on("signal", signal => {
@@ -109,8 +119,16 @@ const Room = (props) => {
         return peer;
     }
 
+    function sendHelloToAll() {
+      var i;
+      peers.forEach((peer, i) => {
+        peer.send('hey you see this?');
+      });
+    }
+
     return (
         <Container>
+          <button onClick={sendHelloToAll}>press me</button>
             <StyledVideo muted ref={userVideo} autoPlay playsInline />
             {peers.map((peer, index) => {
                 return (
