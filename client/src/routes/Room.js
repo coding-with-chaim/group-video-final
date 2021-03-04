@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import Peer from "simple-peer";
 import styled from "styled-components";
-import ReactAudioPlayer from 'react-audio-player';
 
 const Container = styled.div`
     padding: 20px;
@@ -58,7 +57,7 @@ const DataInput = (props) => {
 
 const Room = (props) => {
     const [peers, setPeers] = useState([]);
-    const [audio, setAudio] = useState("");
+    const [audio, setAudio] = useState(null);
     const socketRef = useRef();
     const userVideo = useRef();
     const peersRef = useRef([]);
@@ -121,14 +120,7 @@ const Room = (props) => {
         })
 
         peer.on('data', data => {
-          // got a data channel message
-          console.log('got a message from peer: ' + data)
-          if (isValidURL(data)) {
-            setAudio(data);
-          }
-          else {
-            console.log('not a valid url.');
-          }
+          onDataReceive(data);
         })
 
         return peer;
@@ -142,14 +134,7 @@ const Room = (props) => {
         })
 
         peer.on('data', data => {
-          // got a data channel message
-          console.log('got a message from peer: ' + data)
-          if (isValidURL(data)) {
-            setAudio(data);
-          }
-          else {
-            console.log('not a valid url.');
-          }
+          onDataReceive(data);
         })
 
         peer.on("signal", signal => {
@@ -159,6 +144,22 @@ const Room = (props) => {
         peer.signal(incomingSignal);
 
         return peer;
+    }
+
+    function onDataReceive(data) {
+      if (isValidURL(data)) {
+        setAudio(new Audio(data));
+        console.log("loaded audio from " + data);
+      }
+      else {
+        console.log('not a valid url.');
+        if (data === "play") {
+          if (audio !== null) {
+            console.log("playing audio...");
+            audio.play();
+          }
+        }
+      }
     }
 
     function sendToAll(data) {
@@ -174,12 +175,7 @@ const Room = (props) => {
 
     return (
         <Container>
-          {audio !== "" &&
-            <ReactAudioPlayer
-              src={audio}
-              autoPlay
-            />
-          }
+          <button onClick={() => {sendToAll("play"); audio.play();}}>Play</button>
           <StyledVideo muted ref={userVideo} autoPlay playsInline />
           {peers.map((peer, index) => {
               return (
