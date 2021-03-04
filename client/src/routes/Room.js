@@ -31,11 +31,25 @@ const Video = (props) => {
     );
 }
 
-
 const videoConstraints = {
     height: window.innerHeight / 2,
     width: window.innerWidth / 2
 };
+
+const DataInput = (props) => {
+  const [message, setMessage] = useState("");
+
+  function handleSubmit(e) {
+    props.onSubmit(props.peerKey, message);
+  }
+
+  return (
+    <div>
+      <input type="text" id="message" placeholder="Message" onChange={e => setMessage(e.target.value)}/>
+      <button onClick={handleSubmit}>Send</button>
+    </div>
+  );
+}
 
 const Room = (props) => {
     const [peers, setPeers] = useState([]);
@@ -119,20 +133,26 @@ const Room = (props) => {
         return peer;
     }
 
-    function sendHelloToAll() {
-      var i;
+    function sendToAll(data) {
+      console.log("Send to all: " + data);
       peers.forEach((peer, i) => {
-        peer.send('hey you see this?');
+        peer.send(data);
       });
+    }
+
+    function sendToPeer(peerIndex, data) {
+      peers[peerIndex].send(data);
     }
 
     return (
         <Container>
-          <button onClick={sendHelloToAll}>press me</button>
             <StyledVideo muted ref={userVideo} autoPlay playsInline />
             {peers.map((peer, index) => {
                 return (
+                  <div>
+                    <DataInput onSubmit={sendToPeer} peerKey={index}/>
                     <Video key={index} peer={peer} />
+                  </div>
                 );
             })}
         </Container>
