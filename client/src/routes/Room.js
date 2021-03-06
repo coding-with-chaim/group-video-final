@@ -57,8 +57,9 @@ const DataInput = (props) => {
 
 const Room = (props) => {
     const [peers, setPeers] = useState([]);
-    const [audio, setAudio] = useState(new Audio());
+    const [audioSource, setAudioSource] = useState("");
     const socketRef = useRef();
+    const audioRef = useRef();
     const userVideo = useRef();
     const peersRef = useRef([]);
     const roomID = props.match.params.roomID;
@@ -148,15 +149,14 @@ const Room = (props) => {
 
     function onDataReceive(data) {
       if (isValidURL(data)) {
-        const audioObject = new Audio(data);
-        setAudio(audioObject);
+        setAudioSource(data);
         console.log("loaded audio from " + data);
       }
       else {
         console.log(data + ' not a valid url.');
         if (data.includes('play')) {
           console.log("Received play command");
-          audio.play();
+          audioRef.current.play();
         }
       }
     }
@@ -174,7 +174,13 @@ const Room = (props) => {
 
     return (
         <Container>
-          <button onClick={() => {sendToAll('play'); audio.play();}}>Play</button>
+          <audio ref={audioRef} preload="auto" src={audioSource}/>
+          <button onClick={() => {
+              sendToAll('play');
+              audioRef.current.play();
+          }}>
+            Play
+          </button>
           <StyledVideo muted ref={userVideo} autoPlay playsInline />
           {peers.map((peer, index) => {
               return (
