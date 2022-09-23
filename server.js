@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require("express");
 const http = require("http");
+const path = require('path');
 const app = express();
 const server = http.createServer(app);
 const socket = require("socket.io");
@@ -44,6 +45,13 @@ io.on('connection', socket => {
             users[roomID] = room;
         }
     });
+
+    if(process.env.PROD) {
+        app.use(express.static(path.join(__dirname, './client/build/index.html')));
+        app.get('*', (req, res) => {
+            res.sendFile(path.join(__dirname, './client/build/index.html'));
+        });
+    }
 
 });
 
